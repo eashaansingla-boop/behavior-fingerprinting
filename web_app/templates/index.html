@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Behavioral Biometrics Security</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="background-effects">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="icon">⌨</span>
+                <h1>Keystroke Biometrics</h1>
+            </div>
+            <p class="subtitle">User Identification via Typing Patterns</p>
+        </header>
+
+        <main>
+            <div class="panel glass">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('enroll')">1. User Registration</button>
+                    <button class="tab" id="authTabBtn" onclick="switchTab('auth')">2. Identity Verification</button>
+                </div>
+
+                <!-- ENROLLMENT SECTION -->
+                <div id="enrollSection" class="section active">
+                    <div class="instruction">
+                        <h3>Step 1: Create Your Profile</h3>
+                        <p>Type the following sentence carefully. This will be used as your behavioral baseline.</p>
+                        <div class="target-phrase">In the realm of cybersecurity, traditional passwords are no longer sufficient. Behavioral fingerprinting analyzes the unique microscopic rhythm of your typing. By measuring dwell times and flight times across paragraphs, we create an immutable signature.</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <input type="text" id="enrollUsername" class="username-input" placeholder="Enter Username" autocomplete="off">
+                    </div>
+
+                    <div class="input-wrapper">
+                        <textarea id="enrollInput" placeholder="Start typing here..." autocomplete="off" spellcheck="false"></textarea>
+                        <div class="status-indicator" id="enrollStatus">Awaiting input...</div>
+                    </div>
+                    
+                    <button class="btn primary-btn" id="enrollBtn" disabled>Register Baseline</button>
+                </div>
+
+                <!-- AUTHENTICATION SECTION -->
+                <div id="authSection" class="section">
+                    <div class="instruction">
+                        <h3>Step 2: Verify Identity</h3>
+                        <p>Type the same sentence again. We will compare your current rhythm with your registered profile.</p>
+                        <div class="target-phrase">In the realm of cybersecurity, traditional passwords are no longer sufficient. Behavioral fingerprinting analyzes the unique microscopic rhythm of your typing. By measuring dwell times and flight times across paragraphs, we create an immutable signature.</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <input type="text" id="authUsername" class="username-input" placeholder="Enter Registered Username" autocomplete="off">
+                    </div>
+
+                    <div class="input-wrapper">
+                        <textarea id="authInput" placeholder="Start typing here..." autocomplete="off" spellcheck="false"></textarea>
+                        <div class="status-indicator" id="authStatus">Awaiting input...</div>
+                    </div>
+                    
+                    <button class="btn primary-btn" id="authBtn" disabled>Verify Identity</button>
+                    
+                    <div class="results-panel hidden" id="resultsPanel">
+                        <div class="result-header" id="resultHeader">
+                            <span class="icon" id="resultIcon">■</span>
+                            <h2 id="resultTitle">Analysis Results</h2>
+                        </div>
+                        <div class="metrics">
+                            <div class="metric">
+                                <span class="label">Similarity Score</span>
+                                <span class="value" id="scoreValue">--</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Avg Dwell (Sec)</span>
+                                <span class="value" id="dwellValue">--</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Avg Flight (Sec)</span>
+                                <span class="value" id="flightValue">--</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Threshold</span>
+                                <span class="value" id="thresholdValue">--</span>
+                            </div>
+                            <div class="metric">
+                                <span class="label">Result</span>
+                                <span class="value" id="resultStatus">--</span>
+                            </div>
+                        </div>
+
+                        <!-- SIMPLIFIED CHARTS -->
+                        <div class="charts-grid">
+                            <div class="chart-container">
+                                <h4>Dwell Time Comparison</h4>
+                                <div style="height: 250px; width: 100%;">
+                                    <canvas id="dwellChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <h4>Flight Time Comparison</h4>
+                                <div style="height: 250px; width: 100%;">
+                                    <canvas id="flightChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
