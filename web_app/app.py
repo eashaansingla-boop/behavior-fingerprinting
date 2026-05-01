@@ -4,7 +4,8 @@ import json
 import os
 
 app = Flask(__name__)
-DATABASE_FILE_PATH = 'users.json'
+SCRIPT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+DATABASE_FILE_PATH = os.path.join(SCRIPT_DIRECTORY, 'users.json')
 
 def get_all_saved_users():
     if os.path.exists(DATABASE_FILE_PATH):
