@@ -15,9 +15,18 @@ DATABASE_FILE_PATH = os.path.join(SCRIPT_DIRECTORY, 'users.json')
 MONGODB_URI = os.environ.get('MONGODB_URI')
 db = None
 if MONGODB_URI:
-    client = MongoClient(MONGODB_URI)
-    db = client.get_database('behavior_biometrics')
-    users_collection = db.users
+    try:
+        client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000)
+        # Verify connection
+        client.admin.command('ping')
+        db = client.get_database('behavior_biometrics')
+        users_collection = db.users
+        print("✅ Successfully connected to MongoDB Atlas")
+    except Exception as e:
+        print(f"❌ MongoDB Connection Error: {e}")
+        db = None
+else:
+    print("ℹ️ No MONGODB_URI found. Using local users.json for storage.")
 
 def get_user_profile(username):
     if db is not None:
