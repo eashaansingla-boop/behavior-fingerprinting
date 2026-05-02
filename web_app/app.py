@@ -2,20 +2,52 @@ from flask import Flask, render_template, request, jsonify
 import numpy as np
 import json
 import os
+from pymongo import MongoClient
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 SCRIPT_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 DATABASE_FILE_PATH = os.path.join(SCRIPT_DIRECTORY, 'users.json')
 
-def get_all_saved_users():
-    if os.path.exists(DATABASE_FILE_PATH):
-        with open(DATABASE_FILE_PATH, 'r') as file_reader:
-            return json.load(file_reader)
-    return {}
+# Database Setup
+MONGODB_URI = os.environ.get('MONGODB_URI')
+db = None
+if MONGODB_URI:
+    client = MongoClient(MONGODB_URI)
+    db = client.get_database('behavior_biometrics')
+    users_collection = db.users
 
-def save_user_database(user_data_dictionary):
-    with open(DATABASE_FILE_PATH, 'w') as file_writer:
-        json.dump(user_data_dictionary, file_writer, indent=4)
+def get_user_profile(username):
+    if db is not None:
+        return users_collection.find_one({"username": username})
+    
+    # Fallback to JSON
+    if os.path.exists(DATABASE_FILE_PATH):
+        with open(DATABASE_FILE_PATH, 'r') as f:
+            data = json.load(f)
+            return data.get(username)
+    return None
+
+def save_user_profile(username, profile_data):
+    if db is not None:
+        users_collection.update_one(
+            {"username": username},
+            {"$set": profile_data},
+            upsert=True
+        )
+        return
+
+    # Fallback to JSON
+    data = {}
+    if os.path.exists(DATABASE_FILE_PATH):
+        with open(DATABASE_FILE_PATH, 'r') as f:
+            data = json.load(f)
+    
+    data[username] = profile_data
+    with open(DATABASE_FILE_PATH, 'w') as f:
+        json.dump(data, f, indent=4)
 
 def convert_typing_to_features(raw_keystroke_list):
     if len(raw_keystroke_list) < 10:
@@ -70,9 +102,7 @@ def register_new_user():
     if not calculated_features:
         return jsonify({"success": False, "message": "Need more typing data!"})
             
-    entire_user_list = get_all_saved_users()
-    entire_user_list[selected_username] = calculated_features
-    save_user_database(entire_user_list)
+    save_user_profile(selected_username, calculated_features)
     
     return jsonify({"success": True, "message": f"Profile created for {selected_username}!"})
 
@@ -82,11 +112,10 @@ def verify_user_identity():
     provided_username = incoming_data.get('username')
     new_typing_sample = incoming_data.get('sample', [])
     
-    stored_users = get_all_saved_users()
-    if provided_username not in stored_users:
+    original_user_data = get_user_profile(provided_username)
+    if not original_user_data:
         return jsonify({"success": False, "message": "User not found!"})
         
-    original_user_data = stored_users[provided_username]
     current_user_data = convert_typing_to_features(new_typing_sample)
     
     if not current_user_data:

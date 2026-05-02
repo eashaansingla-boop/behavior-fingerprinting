@@ -110,8 +110,8 @@ document.getElementById('authBtn').addEventListener('click', async () => {
         
         // Update stats
         document.getElementById('scoreValue').textContent = data.score + '%';
-        document.getElementById('dwellValue').textContent = data.test.avg_dwell.toFixed(3);
-        document.getElementById('flightValue').textContent = data.test.avg_flight.toFixed(3);
+        document.getElementById('dwellValue').textContent = data.current.avg_dwell.toFixed(3);
+        document.getElementById('flightValue').textContent = data.current.avg_flight.toFixed(3);
         document.getElementById('thresholdValue').textContent = data.threshold + '%';
         
         const resultStatus = document.getElementById('resultStatus');
@@ -127,8 +127,8 @@ document.getElementById('authBtn').addEventListener('click', async () => {
             panel.style.borderColor = 'var(--danger)';
         }
 
-        renderComparisonChart('dwellChart', data.baseline.raw_dwell, data.test.raw_dwell, 'Dwell Time', dwellChartInstance, (inst) => dwellChartInstance = inst);
-        renderComparisonChart('flightChart', data.baseline.raw_flight, data.test.raw_flight, 'Flight Time', flightChartInstance, (inst) => flightChartInstance = inst);
+        renderComparisonChart('dwellChart', data.baseline.raw_dwell, data.current.raw_dwell, 'Dwell Time', dwellChartInstance, (inst) => dwellChartInstance = inst);
+        renderComparisonChart('flightChart', data.baseline.raw_flight, data.current.raw_flight, 'Flight Time', flightChartInstance, (inst) => flightChartInstance = inst);
     }
 });
 
