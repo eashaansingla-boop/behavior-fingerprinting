@@ -33,7 +33,7 @@ else:
 
 def get_user_profile(username):
     if db is not None:
-        return users_collection.find_one({"username": username})
+        return users_collection.find_one({"username": username}, {"_id": 0})
     
     # Fallback to JSON
     if os.path.exists(DATABASE_FILE_PATH):
@@ -133,10 +133,10 @@ def verify_user_identity():
     if not current_user_data:
         return jsonify({"success": False, "message": "Typing was too short/erratic."})
         
-    match_percentage = get_similarity_percentage(original_user_data, current_user_data)
+    match_percentage = float(get_similarity_percentage(original_user_data, current_user_data))
     
     passing_threshold = 70.0
-    is_user_verified = match_percentage >= passing_threshold
+    is_user_verified = bool(match_percentage >= passing_threshold)
     
     return jsonify({
         "success": True, 
