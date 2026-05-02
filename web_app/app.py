@@ -16,17 +16,20 @@ MONGODB_URI = os.environ.get('MONGODB_URI')
 db = None
 if MONGODB_URI:
     try:
-        client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000)
+        # We strip potential whitespace from the URI
+        clean_uri = MONGODB_URI.strip()
+        client = MongoClient(clean_uri, serverSelectionTimeoutMS=5000)
         # Verify connection
         client.admin.command('ping')
         db = client.get_database('behavior_biometrics')
         users_collection = db.users
         print("✅ Successfully connected to MongoDB Atlas")
     except Exception as e:
-        print(f"❌ MongoDB Connection Error: {e}")
+        print(f"❌ MongoDB Connection Error Type: {type(e).__name__}")
+        print(f"❌ MongoDB Connection Error Detail: {str(e)}")
         db = None
 else:
-    print("ℹ️ No MONGODB_URI found. Using local users.json for storage.")
+    print("ℹ️ No MONGODB_URI found in environment variables.")
 
 def get_user_profile(username):
     if db is not None:
